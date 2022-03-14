@@ -50,14 +50,17 @@ namespace TopDownController
                 DrawBoxVisual();
             }
 
-            UpdateMotionAnimations();
+            UpdateMotion();
         }
-
-        private void UpdateMotionAnimations()
+        private void UpdateMotion()
         {
             foreach (Character chara in CharaList)
             {
                 chara.Anim.SetFloat("speed", chara.VelocityNormalized); 
+                if (chara.PathCompleted)
+                {
+                    chara.FollowTheQueue();
+                }
             }
         }
 

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 namespace TopDownController
@@ -8,7 +8,10 @@ namespace TopDownController
         public GameObject marker;
         public LayerMask Clickable;
         public LayerMask Ground;
-        public Stack<Vector3> OrderQueue;
+        /// <summary> use this key pressing on units to add them to selection </summary>
+        public const KeyCode SelectUnits = KeyCode.LeftControl;
+        /// <summary> use this key to queue movement order of units </summary>
+        public const KeyCode QueueUnits = KeyCode.LeftShift;
         private CharacterSelections charaSelections;
         private Camera cam;
 
@@ -37,7 +40,7 @@ namespace TopDownController
             if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, Clickable))
             {
                 Character hitClickable = hitInfo.transform.GetComponent<Character>();
-                if (Input.GetKey(KeyCode.LeftShift))
+                if (Input.GetKey(SelectUnits))
                 {
                     charaSelections.ShiftClickSelect(hitClickable);
                 }
@@ -48,7 +51,7 @@ namespace TopDownController
             }
             else
             {
-                if (!Input.GetKey(KeyCode.LeftShift))
+                if (!Input.GetKey(SelectUnits))
                 {
                     charaSelections.DeselectAll();
                 }
@@ -71,18 +74,17 @@ namespace TopDownController
                 
                 foreach (Character chara in charaSelections.CharaSelected)
                 {
-
-                    // NEED TO DEFINE MOVEMENT QUEUE
                     bool isInRange = 
-                        Vector3.Distance(hitClickable.transform.position, chara.transform.position) <= chara.InteractionRange;
-                    if (isInRange)
+                        Vector3.Distance(hitClickable.transform.position, chara.transform.position) <= 
+                                        chara.InteractionRange;
+                    
+                    chara.MoveOrderQueue.Clear();
+                    if (hitClickable is Enemy)
                     {
-                        if (hitClickable is Enemy)
-                        {
-                            AttackAnimation(chara);
-                        }
-                        hitClickable.Interact(chara);
+                        AttackAnimation(chara);
+                        Debug.Log("Attack");
                     }
+                    hitClickable.Interact(chara);
                 }
             }
         }
@@ -100,12 +102,21 @@ namespace TopDownController
             {
                 Vector3 destination = hitInfo.point;
                 marker.transform.position = destination;
-                OrderQueue.Push(destination);
                 
                 foreach (var chara in charaSelections.CharaSelected.ToArray())
                 {
                     if (chara.IsMoveable)
-                        chara.NavigatePosition(destination);
+                    {
+                        if (Input.GetKey(QueueUnits))
+                        {
+                            chara.MoveOrderQueue.Enqueue(destination);
+                        }
+                        else
+                        {
+                            chara.MoveOrderQueue.Clear();
+                            chara.NavigatePosition(destination);
+                        }
+                    }
                     else
                         charaSelections.DeSelect(chara);
                 }

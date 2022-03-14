@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
@@ -6,15 +7,19 @@ namespace TopDownController
 {
     public abstract class Character : MonoBehaviour, IPointerClickHandler
     {
+        public Queue<Vector3> MoveOrderQueue;
         public bool IsControllable; // can click on
         [HideInInspector] public Outline Outline;
         [HideInInspector] public Animator Anim;
+        public float InteractionRange = 3f;
         private CharacterSelections charaSelections;
         protected NavMeshAgent agent;
-        public float InteractionRange
-        {
-            get { return agent.stoppingDistance; }
-            set { agent.stoppingDistance = value; }
+        public bool PathCompleted 
+        { 
+            get 
+            { return agent.pathStatus == NavMeshPathStatus.PathComplete && 
+                        agent.remainingDistance == 0; }
+            set { return; }
         }
         public float VelocityNormalized
         {
@@ -43,6 +48,7 @@ namespace TopDownController
         {
             agent = GetComponent<NavMeshAgent>();
             Anim = GetComponentInChildren<Animator>();
+            MoveOrderQueue = new Queue<Vector3>();
         }
         private void OnEnable()
         {
@@ -50,6 +56,13 @@ namespace TopDownController
                 GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
             charaSelections.CharaList.Add(this);
             Outline = GetComponent<Outline>();
+        }
+        public void FollowTheQueue()
+        {
+            if (MoveOrderQueue.Count <= 0) return;
+
+            Vector3 point = MoveOrderQueue.Dequeue();
+            NavigatePosition(point);
         }
         public void NavigatePosition(Vector3 point)
         {

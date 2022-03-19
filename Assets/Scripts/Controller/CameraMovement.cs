@@ -9,14 +9,18 @@ namespace TopDownController
         public float MoveSpeedMinZoom, MoveSpeedMaxZoom;
         public float RotationSpeed;
         public BoxCollider Bounds;
-        // [HideInInspector]
-        public Character LockedChara;
+        public LayerMask Ground;
+        [HideInInspector] public Character LockedChara;
         private Transform swivel, stick;
+        private Camera cam;
         private EdgeRect screenPan;
-        private float zoom = 1f;
+        /// <summary>The starting position of swivel & stick</summary>
+        private float zoom = 0.6f;
         private float rotationAngle;
         private float screenEdgePan = 25f;
         private const float yRot = 50f;
+        private Vector3 dragStartPos;
+        private Vector3 dragCurrentPos;
 
         private struct EdgeRect
         {
@@ -33,6 +37,7 @@ namespace TopDownController
 
         private void Awake() 
         {
+            cam = Camera.main;
             swivel = transform.GetChild(0);
             stick = swivel.GetChild(0);
 
@@ -44,31 +49,60 @@ namespace TopDownController
             );
         }
 
-        private void Update() 
+        private void Update()
         {
             float zoomDelta = Input.GetAxis("Mouse ScrollWheel");
-            if (zoomDelta != 0f) 
+            if (zoomDelta != 0f)
             {
                 AdjustZoom(zoomDelta);
             }
 
             float rotationDelta = Input.GetAxis("Rotation");
-            if (rotationDelta != 0f) 
+            if (rotationDelta != 0f)
             {
                 AdjustRotation(rotationDelta);
             }
 
             float xDelta = Input.GetAxis("Horizontal");
             float zDelta = Input.GetAxis("Vertical");
-            if (xDelta != 0f || zDelta != 0f) 
+            if (xDelta != 0f || zDelta != 0f)
             {
                 AdjustPosition(xDelta, zDelta);
             }
             AdjustPosition();
+            AdjustPositionMouseWheel();
 
             if (Input.GetKey(KeyCode.Y))
             {
                 LockCharacter();
+            }
+
+        }
+
+        private void AdjustPositionMouseWheel()
+        {
+            if (Input.GetKeyDown(KeyCode.Mouse2))
+            {
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, Ground))
+                {
+                    dragStartPos = new Vector3(hitInfo.point.x, 0, hitInfo.point.z);
+                }
+            }
+
+            if (Input.GetKey(KeyCode.Mouse2))
+            {
+                Ray ray2 = cam.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray2, out RaycastHit hitInfo2, Mathf.Infinity, Ground))
+                {
+                    dragCurrentPos = new Vector3(hitInfo2.point.x, 0, hitInfo2.point.z);
+
+                    Vector3 position = transform.localPosition;
+                    position += dragStartPos - dragCurrentPos;
+
+                    transform.localPosition = Bounds ? 
+                        transform.localPosition = ClampPosition(position) : position;
+                }
             }
         }
 

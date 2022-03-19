@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,17 +49,13 @@ namespace TopDownController
                 DrawBoxVisual();
             }
 
-            UpdateMotion();
+            UpdateAnimations();
         }
-        private void UpdateMotion()
+        private void UpdateAnimations()
         {
             foreach (Character chara in CharaList)
             {
                 chara.Anim.SetFloat("speed", chara.VelocityNormalized); 
-                if (chara.PathCompleted)
-                {
-                    chara.FollowTheQueue();
-                }
             }
         }
 

@@ -141,29 +141,11 @@ public class Outline : MonoBehaviour
     }
     private void Update()
     {
-        // if (Input.GetMouseButton(0))
-        // {
-        //     Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        //     RaycastHit hit;
-        //     if (Physics.Raycast(ray, out hit, Mathf.Infinity, MaskLayer))
-        //     {
-		// 		Renderer hitRenderer = 
-		// 			hit.transform.GetComponentInParent<Outline>().Renderers[0];
-        //         if (hitRenderer == Renderers[0])
-		// 		{
-					// Activate();
-					if (needsUpdate)
-					{
-						needsUpdate = false;
-						UpdateMaterialProperties();
-					}
-				// }
-			// 	else
-			// 		Remove();
-            // }
-            // else
-			// 	Remove();
-        // }
+        if (needsUpdate)
+        {
+            needsUpdate = false;
+            UpdateMaterialProperties();
+        }
     }
     public void Activate()
     {

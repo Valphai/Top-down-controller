@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,12 +8,15 @@ namespace TopDownController
 {
     public abstract class Character : MonoBehaviour, IPointerClickHandler
     {
-        public Queue<Vector3> MoveOrderQueue;
+        public Queue<Action> MoveOrderQueue;
         public bool IsControllable; // can click on
         [HideInInspector] public Outline Outline;
         [HideInInspector] public Animator Anim;
-        public float InteractionRange = 3f;
+        [HideInInspector] public float Height;
+        [HideInInspector] public float Width;
+        public float InteractionRange = .7f;
         private CharacterSelections charaSelections;
+        private CapsuleCollider capsuleCollider;
         protected NavMeshAgent agent;
         public bool PathCompleted 
         { 
@@ -48,7 +52,10 @@ namespace TopDownController
         {
             agent = GetComponent<NavMeshAgent>();
             Anim = GetComponentInChildren<Animator>();
-            MoveOrderQueue = new Queue<Vector3>();
+            capsuleCollider = GetComponent<CapsuleCollider>();
+            Height = capsuleCollider.height;
+            Width = capsuleCollider.radius;
+            MoveOrderQueue = new Queue<Action>();
         }
         private void OnEnable()
         {
@@ -57,16 +64,21 @@ namespace TopDownController
             charaSelections.CharaList.Add(this);
             Outline = GetComponent<Outline>();
         }
+
         public void FollowTheQueue()
         {
             if (MoveOrderQueue.Count <= 0) return;
 
-            Vector3 point = MoveOrderQueue.Dequeue();
-            NavigatePosition(point);
+            Action action = MoveOrderQueue.Dequeue();
+            action?.Invoke();
         }
         public void NavigatePosition(Vector3 point)
         {
             agent.destination = point;
+        }
+        public void AttackAnimation()
+        {
+            Anim.SetTrigger("attack");
         }
         private void OnDestroy()	
         {
@@ -78,6 +90,17 @@ namespace TopDownController
             if (eventData.clickCount >= 1) 
             {
                 charaSelections.LockCharacter(this);
+            }
+        }
+        private void OnMouseOver()	
+        {
+            Outline.Activate();
+        }
+        private void OnMouseExit()	
+        {
+            if (!charaSelections.CharaSelected.Contains(this))
+            {
+                Outline.Remove();
             }
         }
     }

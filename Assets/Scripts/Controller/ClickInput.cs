@@ -36,7 +36,7 @@ namespace TopDownController
         }
         private void UpdateUnitQueue()
         {
-            foreach (Character chara in charaSelections.CharaSelected.ToArray())
+            foreach (Character chara in charaSelections.CharaList.ToArray())
             {
                 if (chara.PathCompleted || 
                     (!Input.GetKey(QueueUnitsButton) && Input.GetMouseButtonDown(1)))

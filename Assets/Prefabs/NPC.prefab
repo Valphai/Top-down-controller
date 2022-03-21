@@ -553,7 +553,7 @@ NavMeshAgent:
   m_Acceleration: 999
   avoidancePriority: 50
   m_AngularSpeed: 350
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -576,9 +576,7 @@ MonoBehaviour:
   IsControllable: 0
   Outline: {fileID: 0}
   Anim: {fileID: 0}
-  Height: 0
-  Width: 0
-  InteractionRange: 2
+  InteractionRange: 1
 --- !u!1 &5332169166053731480
 GameObject:
   m_ObjectHideFlags: 0

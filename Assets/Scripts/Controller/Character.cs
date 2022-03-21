@@ -12,11 +12,8 @@ namespace TopDownController
         public bool IsControllable; // can click on
         [HideInInspector] public Outline Outline;
         [HideInInspector] public Animator Anim;
-        [HideInInspector] public float Height;
-        [HideInInspector] public float Width;
         public float InteractionRange = .7f;
         private CharacterSelections charaSelections;
-        private CapsuleCollider capsuleCollider;
         protected NavMeshAgent agent;
         public bool PathCompleted 
         { 
@@ -52,9 +49,6 @@ namespace TopDownController
         {
             agent = GetComponent<NavMeshAgent>();
             Anim = GetComponentInChildren<Animator>();
-            capsuleCollider = GetComponent<CapsuleCollider>();
-            Height = capsuleCollider.height;
-            Width = capsuleCollider.radius;
             MoveOrderQueue = new Queue<Action>();
         }
         private void OnEnable()

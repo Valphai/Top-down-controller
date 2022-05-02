@@ -147,6 +147,10 @@ public class Outline : MonoBehaviour
             UpdateMaterialProperties();
         }
     }
+    private void OnMouseOver()
+    {
+        Activate();
+    }
     public void Activate()
     {
         foreach (var renderer in Renderers)

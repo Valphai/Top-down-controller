@@ -4,16 +4,17 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
 
-namespace TopDownController
+namespace TopDownController.Controller
 {
     public abstract class Character : MonoBehaviour, IPointerClickHandler
     {
         public Queue<Action> MoveOrderQueue;
-        public bool IsControllable; // can click on
-        [HideInInspector] public Outline Outline;
-        [HideInInspector] public Animator Anim;
+        public bool IsControlable;
         public float InteractionRange = .7f;
+        private Animator anim;
+        private Outline outline;
         private CharacterSelections charaSelections;
+        private List<Collider> ragdollParts;
         protected NavMeshAgent agent;
         public bool PathCompleted 
         { 
@@ -22,43 +23,39 @@ namespace TopDownController
                         agent.remainingDistance == 0; }
             set { return; }
         }
-        public float VelocityNormalized
+        public abstract void InteractWith(Character chara);
+        private void Awake()
         {
-            get { return agent.velocity.magnitude/agent.speed; }
-            set { return; }
-        }
-        
-        private bool isMoveable;
-
-        public bool IsMoveable
-        {
-            get
-            {
-                return IsControllable ? isMoveable : false;
-            }
-            set 
-            {
-                if (IsControllable)
-                    isMoveable = value;
-                else
-                    isMoveable = false;
-            }
-        }
-        public abstract void Interact(Character chara);
-        private void Awake()	
-        {
+            outline = GetComponent<Outline>();
             agent = GetComponent<NavMeshAgent>();
-            Anim = GetComponentInChildren<Animator>();
+            anim = GetComponentInChildren<Animator>();
             MoveOrderQueue = new Queue<Action>();
+            GetRagdollParts();
         }
+
         private void OnEnable()
         {
-            charaSelections = 
-                GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
+            charaSelections = CharacterSelections.Instance;
             charaSelections.CharaList.Add(this);
-            Outline = GetComponent<Outline>();
+        }
+        private void OnDisable()	
+        {
+            charaSelections.RemoveFromCharaList(this);
         }
 
+        public virtual void MoveAnimation()
+        {
+            float velocityNormalized = agent.velocity.magnitude / agent.speed;
+            anim.SetFloat("speed", velocityNormalized); 
+        }
+        public virtual void AttackAnimation()
+        {
+            anim.SetTrigger("attack");
+        }
+        public virtual void DieAnimation()
+        {
+            anim.SetBool("dead", true);
+        }
         public void FollowTheQueue()
         {
             if (MoveOrderQueue.Count <= 0) return;
@@ -70,15 +67,20 @@ namespace TopDownController
         {
             agent.destination = point;
         }
-        public void AttackAnimation()
+        public virtual void Die()
         {
-            Anim.SetTrigger("attack");
+            charaSelections.RemoveFromCharaList(this);
+            MoveOrderQueue.Clear();
+            agent.enabled = false;
+            if (ragdollParts.Count > 0) 
+            {
+                TurnOnRagdoll();
+            }
+            else 
+            {
+                DieAnimation();
+            }
         }
-        private void OnDestroy()	
-        {
-            charaSelections.CharaList.Remove(this);
-        }
-
         public void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.clickCount >= 1) 
@@ -86,15 +88,50 @@ namespace TopDownController
                 charaSelections.LockCharacter(this);
             }
         }
-        private void OnMouseOver()	
+        public void Deselect()
         {
-            Outline.Activate();
+            if (outline)
+            {
+                outline.Remove();
+            }
+        }
+        public void Select()
+        {
+            outline.Activate();
         }
         private void OnMouseExit()	
         {
-            if (!charaSelections.CharaSelected.Contains(this))
+            if (
+                !charaSelections.CharaSelected.Contains(this)
+            )
             {
-                Outline.Remove();
+                outline.Remove();
+            }
+        }
+        private void TurnOnRagdoll()
+        {
+            Rigidbody rb = GetComponent<Rigidbody>();
+            rb.useGravity = false;
+            gameObject.GetComponent<BoxCollider>().enabled = false;
+            anim.enabled = false;
+            anim.avatar = null;
+
+            foreach (Collider c in ragdollParts)
+            {
+                c.isTrigger = false;
+                // c.attachedRigidbody.velocity = Vector3.zero;
+            }
+        }
+        private void GetRagdollParts()
+        {
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            foreach (Collider c in colliders)
+            {
+                if (c.gameObject != gameObject)
+                {
+                    c.isTrigger = true;
+                    ragdollParts.Add(c);
+                }
             }
         }
     }

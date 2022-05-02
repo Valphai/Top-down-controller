@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TopDownController
+namespace TopDownController.Controller
 {
     public class CameraMovement : MonoBehaviour
     {
@@ -72,7 +72,7 @@ namespace TopDownController
             AdjustPosition();
             AdjustPositionMouseWheel();
 
-            if (Input.GetKey(KeyCode.Y))
+            if (Input.GetKey(ClickInput.LockUnitButton))
             {
                 LockCharacter();
             }

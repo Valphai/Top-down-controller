@@ -1,25 +1,29 @@
 using System;
 using UnityEngine;
 
-namespace TopDownController
+namespace TopDownController.Controller
 {
     public class ClickInput : MonoBehaviour
     {
-        public GameObject marker;
+        public GameObject Marker;
         public LayerMask Clickable;
         public LayerMask Ground;
-        /// <summary> use this key pressing on units to add them to selection </summary>
+        
+        [Tooltip("use this key pressing on units to add them to selection")]
         public const KeyCode SelectUnitsButton = KeyCode.LeftControl;
-        /// <summary> use this key to queue movement order of units </summary>
+
+        [Tooltip("use this key to queue movement order of units")]
         public const KeyCode QueueUnitsButton = KeyCode.LeftShift;
+        
+        [Tooltip("use this key to lock the camera onto the selected character")]
+        public const KeyCode LockUnitButton = KeyCode.Y;
         private CharacterSelections charaSelections;
         private Camera cam;
 
-        private void Awake()	
+        private void Awake()
         {
             cam = Camera.main;
-            charaSelections = 
-                GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
+            charaSelections = CharacterSelections.Instance;
         }
         private void Update()	
         {
@@ -38,8 +42,14 @@ namespace TopDownController
         {
             foreach (Character chara in charaSelections.CharaList.ToArray())
             {
-                if (chara.PathCompleted || 
-                    (!Input.GetKey(QueueUnitsButton) && Input.GetMouseButtonDown(1)))
+                if (chara.PathCompleted)
+                {
+                    chara.FollowTheQueue();
+                }
+            }
+            foreach (Character chara in charaSelections.CharaSelected.ToArray())
+            {
+                if(!Input.GetKey(QueueUnitsButton) && Input.GetMouseButtonDown(1))
                 {
                     chara.FollowTheQueue();
                 }
@@ -83,7 +93,7 @@ namespace TopDownController
             }
             else if (Physics.Raycast(ray, out RaycastHit hitInfo2, Mathf.Infinity, Ground))
             {
-                marker.transform.position = hitInfo2.point;
+                Marker.transform.position = hitInfo2.point;
                 Action<RaycastHit, Character> action = MoveCharacter;
                 QueueUnits(hitInfo2, action);
             }
@@ -158,7 +168,7 @@ namespace TopDownController
             {
                 chara.AttackAnimation();
             }
-            hitClickable.Interact(chara);
+            hitClickable.InteractWith(chara);
         }
         private void MoveCharacter(RaycastHit hitInfo, Character chara)
         {
@@ -166,7 +176,7 @@ namespace TopDownController
         }
         private void MoveCharacter(Vector3 destination, Character chara)
         {
-            if (chara.IsMoveable)
+            if (chara.IsControlable)
             {
                 chara.NavigatePosition(destination);
             }

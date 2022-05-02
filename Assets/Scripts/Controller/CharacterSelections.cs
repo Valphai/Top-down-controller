@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TopDownController
+namespace TopDownController.Controller
 {
     public class CharacterSelections : MonoBehaviour
     {
+        public static CharacterSelections Instance { get; private set; }
         public List<Character> CharaList = new List<Character>();
         public List<Character> CharaSelected = new List<Character>();
 
@@ -14,9 +15,14 @@ namespace TopDownController
         private CameraMovement camMovement;
         private Rect selectionBox;
         private Vector2 startPos, endPos;
-        private Character lockedCharacter;
 
-
+        private void OnEnable() 
+        {
+            if (Instance != null && Instance != this) 
+                Destroy(this);
+            else 
+                Instance = this;
+        }
         private void Awake()	
         {
             cam = Camera.main;
@@ -55,7 +61,7 @@ namespace TopDownController
         {
             foreach (Character chara in CharaList)
             {
-                chara.Anim.SetFloat("speed", chara.VelocityNormalized); 
+                chara.MoveAnimation();
             }
         }
 
@@ -75,12 +81,18 @@ namespace TopDownController
                 DeSelect(chara);
             }
         }
+        public void RemoveFromCharaList(Character chara)
+        {
+            if(CharaList.Contains(chara))
+            {
+                CharaList.Remove(chara);
+            }
+        }
         public void DeselectAll()
         {
             foreach (var chara in CharaSelected)
             {
-                chara.IsMoveable = false;
-                chara.Outline.Remove();
+                chara.Deselect();
             }
             CharaSelected.Clear();
         }
@@ -90,15 +102,13 @@ namespace TopDownController
         }
         public void DeSelect(Character chara)
         {
-            chara.IsMoveable = false;
-            chara.Outline.Remove();
+            chara.Deselect();
             CharaSelected.Remove(chara);
         }
         private void Select(Character chara)
         {
-            chara.Outline.Activate();
+            chara.Select();
             CharaSelected.Add(chara);
-            chara.IsMoveable = true;
         }
         private void DragSelect(Character chara)
         {

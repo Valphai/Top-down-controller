@@ -87,48 +87,40 @@ namespace TopDownController.Controller
 
             if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, Clickable))
             {
-                Action<RaycastHit, Character> action = MoveTowards;
-                Action<RaycastHit, Character> action2 = Interact;
-                QueueUnits(hitInfo, action, action2);
+                var actions = new Action<RaycastHit, Character>[] {
+                    MoveTowards,
+                    Interact,
+                };
+                QueueUnits(hitInfo, actions);
             }
             else if (Physics.Raycast(ray, out RaycastHit hitInfo2, Mathf.Infinity, Ground))
             {
                 Marker.transform.position = hitInfo2.point;
-                Action<RaycastHit, Character> action = MoveCharacter;
-                QueueUnits(hitInfo2, action);
+                var actions = new Action<RaycastHit, Character>[] {
+                    MoveTowards,
+                };
+                QueueUnits(hitInfo2, actions);
             }
         }
 
-        private void QueueUnits(RaycastHit hitInfo, Action<RaycastHit, Character> action)
+        private void QueueUnits(RaycastHit hitInfo, Action<RaycastHit, Character>[] actions)
         {
             foreach (Character chara in charaSelections.CharaSelected.ToArray())
             {
                 if (Input.GetKey(QueueUnitsButton))
                 {
-                    chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
+                    foreach (var action in actions)
+                    {
+                        chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
+                    }
                 }
                 else
                 {
                     chara.MoveOrderQueue.Clear();
-                    chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
-                }
-            }
-        }
-        private void QueueUnits(RaycastHit hitInfo, Action<RaycastHit, Character> action, 
-            Action<RaycastHit, Character> action2)
-        {
-            foreach (Character chara in charaSelections.CharaSelected.ToArray())
-            {
-                if (Input.GetKey(QueueUnitsButton))
-                {
-                    chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
-                    chara.MoveOrderQueue.Enqueue(() => action2(hitInfo, chara));
-                }
-                else
-                {
-                    chara.MoveOrderQueue.Clear();
-                    chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
-                    chara.MoveOrderQueue.Enqueue(() => action2(hitInfo, chara));
+                    foreach (var action in actions)
+                    {
+                        chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
+                    }
                 }
             }
         }

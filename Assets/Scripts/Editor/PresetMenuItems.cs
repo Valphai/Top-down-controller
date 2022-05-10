@@ -5,7 +5,7 @@ namespace TopDownController.Editor
 {
     public class PresetMenuItems : MonoBehaviour
     {
-        [MenuItem("Tools/Top down controler/Camera and selections")]
+        [MenuItem("Tools/Top down controler/Essentials")]
         private static void CreateEssentials(MenuCommand menuCommand)
         {
             Spawn(menuCommand, "Assets/Prefabs/---CAMERA---.prefab", false);

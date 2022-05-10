@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using TopDownController.Commands;
 using UnityEngine;
 
 namespace TopDownController.Controller
@@ -23,7 +26,8 @@ namespace TopDownController.Controller
         private void Awake()
         {
             cam = Camera.main;
-            charaSelections = CharacterSelections.Instance;
+            charaSelections = 
+                GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
         }
         private void Update()	
         {
@@ -42,14 +46,9 @@ namespace TopDownController.Controller
         {
             foreach (Character chara in charaSelections.CharaList.ToArray())
             {
-                if (chara.PathCompleted)
-                {
-                    chara.FollowTheQueue();
-                }
-            }
-            foreach (Character chara in charaSelections.CharaSelected.ToArray())
-            {
-                if(!Input.GetKey(QueueUnitsButton) && Input.GetMouseButtonDown(1))
+                if (chara.PathCompleted || 
+                    (!Input.GetKey(QueueUnitsButton) && Input.GetMouseButtonDown(1))
+                )
                 {
                     chara.FollowTheQueue();
                 }
@@ -84,96 +83,89 @@ namespace TopDownController.Controller
         private void RMB()
         {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            ICommand[] commands = null;
+            Transform hitClickable = null;
+            Vector3 point = Vector3.zero;
 
             if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, Clickable))
             {
-                var actions = new Action<RaycastHit, Character>[] {
-                    MoveTowards,
-                    Interact,
+                hitClickable = hitInfo.transform;
+                Character toInteractWith = hitClickable.GetComponent<Character>();
+                point = hitInfo.point;
+
+                commands = new ICommand[] {
+                    new MoveCommand(),
+                    new InteractCommand(toInteractWith)
                 };
-                QueueUnits(hitInfo, actions);
             }
             else if (Physics.Raycast(ray, out RaycastHit hitInfo2, Mathf.Infinity, Ground))
             {
-                Marker.transform.position = hitInfo2.point;
-                var actions = new Action<RaycastHit, Character>[] {
-                    MoveTowards,
+                hitClickable = hitInfo2.transform;
+                point = hitInfo2.point;
+
+                Marker.transform.position = point;
+
+                commands = new ICommand[] {
+                    new MoveCommand(),
                 };
-                QueueUnits(hitInfo2, actions);
             }
+            Vector3[] points = 
+                GetPositionsAround(
+                    point, charaSelections.CharaSelected, hitClickable
+                );
+            QueueUnits(commands, points);
         }
 
-        private void QueueUnits(RaycastHit hitInfo, Action<RaycastHit, Character>[] actions)
+
+        private void QueueUnits(ICommand[] commands, Vector3[] positions)
         {
-            foreach (Character chara in charaSelections.CharaSelected.ToArray())
+            Character[] charaArray = charaSelections.CharaSelected.ToArray();
+            for (int i = 0; i < charaArray.Length; i++)
             {
+                Character chara = charaArray[i];
+                Vector3 goal = positions[i];
                 if (Input.GetKey(QueueUnitsButton))
                 {
-                    foreach (var action in actions)
+                    foreach (ICommand command in commands)
                     {
-                        chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
+                        chara.MoveOrderQueue.Enqueue(() => command.Execute(goal, chara));
                     }
                 }
                 else
                 {
                     chara.MoveOrderQueue.Clear();
-                    foreach (var action in actions)
+                    foreach (ICommand command in commands)
                     {
-                        chara.MoveOrderQueue.Enqueue(() => action(hitInfo, chara));
+                        chara.MoveOrderQueue.Enqueue(() => command.Execute(goal, chara));
                     }
                 }
             }
         }
-
-        private void MoveTowards(RaycastHit hitInfo, Character chara)
+        private Vector3[] GetPositionsAround(
+            Vector3 point, List<Character> selectedCharas, Transform clicked
+        )
         {
-            Character hitClickable = hitInfo.transform.GetComponent<Character>();
+            Vector3[] positions = new Vector3[selectedCharas.Count];
 
-            Vector3 target = hitClickable.transform.position;
-            Vector3 charaPos = chara.transform.position;
-
-            if (Vector3.Distance(target, charaPos) > chara.InteractionRange)
+            for (int i = 0; i < selectedCharas.Count; i++)
             {
-                Vector3 standByPoint =
-                    target + ((charaPos - target).normalized) * chara.InteractionRange;
-                MoveCharacter(standByPoint, chara);
+                Vector3 charaPos = selectedCharas[i].transform.position;
+                Vector3 target = clicked.position;
+                if (Vector3.Distance(target, charaPos) < selectedCharas[i].InteractionRange)
+                {
+                    positions[i] = charaPos;
+                    continue;
+                }
+
+                float angle = i * 2 * Mathf.PI / selectedCharas.Count;
+                positions[i] = point + ApplyRotation(angle) * selectedCharas[i].InteractionRange;
             }
-            else
-                MoveCharacter(charaPos, chara);
+            return positions;
         }
 
-        private void Interact(RaycastHit hitInfo, Character chara)
+        private Vector3 ApplyRotation(float angle)
         {
-            Character hitClickable = hitInfo.transform.GetComponent<Character>();
-
-            Vector3 target = hitClickable.transform.position;
-            Vector3 charaPos = chara.transform.position;
-            Vector3 direction = target - charaPos;
-
-            // to prevent message in unity saying "Look rotation viewing vector is zero"
-            if (direction != Vector3.zero)  
-            {
-                Quaternion rotation = Quaternion.LookRotation(direction);
-                chara.transform.rotation = rotation;
-            }
-            if (hitClickable is Enemy)
-            {
-                chara.AttackAnimation();
-            }
-            hitClickable.InteractWith(chara);
-        }
-        private void MoveCharacter(RaycastHit hitInfo, Character chara)
-        {
-            MoveCharacter(hitInfo.point, chara);
-        }
-        private void MoveCharacter(Vector3 destination, Character chara)
-        {
-            if (chara.IsControlable)
-            {
-                chara.NavigatePosition(destination);
-            }
-            else
-                charaSelections.DeSelect(chara);
+            return Quaternion.Euler(0, 0, angle) * Vector3.right;
         }
     }
 }

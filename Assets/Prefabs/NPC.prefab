@@ -107,8 +107,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsControlable: 0
-  Outline: {fileID: 0}
-  Anim: {fileID: 0}
   InteractionRange: 1
 --- !u!1001 &3523616822758232347
 PrefabInstance:
@@ -169,6 +167,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TheDude
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: d64e26ec57ff0584689ab805bde592aa, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 52ba7af246d91d74a9b304e5de52c86a, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d64e26ec57ff0584689ab805bde592aa, type: 3}
 --- !u!4 &3993812889392985840 stripped

@@ -5,7 +5,6 @@ namespace TopDownController.Controller
 {
     public class CharacterSelections : MonoBehaviour
     {
-        public static CharacterSelections Instance { get; private set; }
         public List<Character> CharaList = new List<Character>();
         public List<Character> CharaSelected = new List<Character>();
 
@@ -16,13 +15,6 @@ namespace TopDownController.Controller
         private Rect selectionBox;
         private Vector2 startPos, endPos;
 
-        private void OnEnable() 
-        {
-            if (Instance != null && Instance != this) 
-                Destroy(this);
-            else 
-                Instance = this;
-        }
         private void Awake()	
         {
             cam = Camera.main;

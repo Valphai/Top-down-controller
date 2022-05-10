@@ -9,7 +9,7 @@ namespace TopDownController.Controller
     public abstract class Character : MonoBehaviour, IPointerClickHandler
     {
         public Queue<Action> MoveOrderQueue;
-        public bool IsControlable;
+        [SerializeField] private bool isControlable;
         public float InteractionRange = .7f;
         private Animator anim;
         private Outline outline;
@@ -30,12 +30,14 @@ namespace TopDownController.Controller
             agent = GetComponent<NavMeshAgent>();
             anim = GetComponentInChildren<Animator>();
             MoveOrderQueue = new Queue<Action>();
+            ragdollParts = new List<Collider>();
             GetRagdollParts();
         }
 
         private void OnEnable()
         {
-            charaSelections = CharacterSelections.Instance;
+            charaSelections = 
+                GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
             charaSelections.CharaList.Add(this);
         }
         private void OnDisable()	
@@ -60,12 +62,17 @@ namespace TopDownController.Controller
         {
             if (MoveOrderQueue.Count <= 0) return;
 
-            Action action = MoveOrderQueue.Dequeue();
-            action?.Invoke();
+            Action command = MoveOrderQueue.Dequeue();
+            command?.Invoke();
         }
         public void NavigatePosition(Vector3 point)
         {
-            agent.destination = point;
+            if (isControlable)
+            {
+                agent.destination = point;
+            }
+            else
+                charaSelections.DeSelect(this);
         }
         public virtual void Die()
         {

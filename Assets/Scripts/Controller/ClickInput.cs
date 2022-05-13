@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TopDownController.Commands;
@@ -8,7 +7,6 @@ namespace TopDownController.Controller
 {
     public class ClickInput : MonoBehaviour
     {
-        public GameObject Marker;
         public LayerMask Clickable;
         public LayerMask Ground;
         
@@ -20,8 +18,10 @@ namespace TopDownController.Controller
         
         [Tooltip("use this key to lock the camera onto the selected character")]
         public const KeyCode LockUnitButton = KeyCode.Y;
+        [SerializeField] private Marker marker;
         private CharacterSelections charaSelections;
         private Camera cam;
+        private float lastExecution;
 
         private void Awake()
         {
@@ -39,16 +39,14 @@ namespace TopDownController.Controller
             {
                 RMB();
             }
-
             UpdateUnitQueue();
+
         }
         private void UpdateUnitQueue()
         {
-            foreach (Character chara in charaSelections.CharaList.ToArray())
+            foreach (Character chara in charaSelections.CharaList)
             {
-                if (chara.PathCompleted || 
-                    (!Input.GetKey(QueueUnitsButton) && Input.GetMouseButtonDown(1))
-                )
+                if (chara.PathCompleted)
                 {
                     chara.FollowTheQueue();
                 }
@@ -84,14 +82,16 @@ namespace TopDownController.Controller
         {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             ICommand[] commands = null;
-            Transform hitClickable = null;
+            Transform clicked = null;
             Vector3 point = Vector3.zero;
 
             if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, Clickable))
             {
-                hitClickable = hitInfo.transform;
-                Character toInteractWith = hitClickable.GetComponent<Character>();
+                clicked = hitInfo.transform;
+                CanInteract toInteractWith = clicked.GetComponent<CanInteract>();
                 point = hitInfo.point;
+
+                marker.ClickedOn(toInteractWith);
 
                 commands = new ICommand[] {
                     new MoveCommand(),
@@ -100,30 +100,36 @@ namespace TopDownController.Controller
             }
             else if (Physics.Raycast(ray, out RaycastHit hitInfo2, Mathf.Infinity, Ground))
             {
-                hitClickable = hitInfo2.transform;
+                clicked = hitInfo2.transform;
                 point = hitInfo2.point;
 
-                Marker.transform.position = point;
+                marker.MoveTo(point);
 
                 commands = new ICommand[] {
                     new MoveCommand(),
                 };
             }
+
+            List<Character> charaSel = charaSelections.CharaSelected;
+            if (charaSel.Count <= 0) return;
+
             Vector3[] points = 
                 GetPositionsAround(
-                    point, charaSelections.CharaSelected, hitClickable
+                    point, charaSel, clicked
                 );
-            QueueUnits(commands, points);
+            QueueUnits(commands, points, charaSel);
         }
 
 
-        private void QueueUnits(ICommand[] commands, Vector3[] positions)
+        private void QueueUnits(
+            ICommand[] commands, Vector3[] positions, List<Character> charaSel
+        )
         {
-            Character[] charaArray = charaSelections.CharaSelected.ToArray();
-            for (int i = 0; i < charaArray.Length; i++)
+            for (int i = 0; i < charaSel.Count; i++)
             {
-                Character chara = charaArray[i];
+                Character chara = charaSel[i];
                 Vector3 goal = positions[i];
+                
                 if (Input.GetKey(QueueUnitsButton))
                 {
                     foreach (ICommand command in commands)
@@ -133,11 +139,12 @@ namespace TopDownController.Controller
                 }
                 else
                 {
-                    chara.MoveOrderQueue.Clear();
+                    chara.ResetQueue();
                     foreach (ICommand command in commands)
                     {
                         chara.MoveOrderQueue.Enqueue(() => command.Execute(goal, chara));
                     }
+                    chara.FollowTheQueue();
                 }
             }
         }
@@ -145,19 +152,18 @@ namespace TopDownController.Controller
             Vector3 point, List<Character> selectedCharas, Transform clicked
         )
         {
-            Vector3[] positions = new Vector3[selectedCharas.Count];
+            int charaCount = selectedCharas.Count;
+            Vector3[] positions = new Vector3[charaCount];
 
-            for (int i = 0; i < selectedCharas.Count; i++)
+            if (charaCount <= 1)
             {
-                Vector3 charaPos = selectedCharas[i].transform.position;
-                Vector3 target = clicked.position;
-                if (Vector3.Distance(target, charaPos) < selectedCharas[i].InteractionRange)
-                {
-                    positions[i] = charaPos;
-                    continue;
-                }
+                positions[0] = point;
+                return positions;
+            }
 
-                float angle = i * 2 * Mathf.PI / selectedCharas.Count;
+            for (int i = 0; i < charaCount; i++)
+            {
+                float angle = i * 360f / charaCount;
                 positions[i] = point + ApplyRotation(angle) * selectedCharas[i].InteractionRange;
             }
             return positions;
@@ -165,7 +171,7 @@ namespace TopDownController.Controller
 
         private Vector3 ApplyRotation(float angle)
         {
-            return Quaternion.Euler(0, 0, angle) * Vector3.right;
+            return Quaternion.Euler(0, angle, 0) * Vector3.right;
         }
     }
 }

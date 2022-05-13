@@ -6,7 +6,7 @@ namespace TopDownController.Controller
         /// Define the behaviour when this player has been clicked on
         /// </summary>
         /// <param name="chara">Selected character when click happend</param>
-        public override void InteractWith(Character chara)
+        public override void InteractWith(CanInteract interactable)
         {
 
         }

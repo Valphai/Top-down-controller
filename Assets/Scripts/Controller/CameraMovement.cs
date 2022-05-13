@@ -10,7 +10,9 @@ namespace TopDownController.Controller
         public float RotationSpeed;
         public BoxCollider Bounds;
         public LayerMask Ground;
-        [HideInInspector] public Character LockedChara;
+        
+        [HideInInspector] 
+        public Transform LockedTransform;
         private Transform swivel, stick;
         private Camera cam;
         private EdgeRect screenPan;
@@ -108,9 +110,9 @@ namespace TopDownController.Controller
 
         public void LockCharacter()
         {
-            if (LockedChara != null)
+            if (LockedTransform != null)
             {
-                Vector3 position = LockedChara.transform.localPosition;
+                Vector3 position = LockedTransform.transform.localPosition;
                 transform.localPosition = ClampPosition(position);
             }
         }
@@ -142,7 +144,7 @@ namespace TopDownController.Controller
 
         private void AdjustPosition(float xDelta, float zDelta)
         {
-            LockedChara = null;
+            LockedTransform = null;
 
             Quaternion angle = Quaternion.AngleAxis(yRot, Vector3.up);
             Vector3 direction = 

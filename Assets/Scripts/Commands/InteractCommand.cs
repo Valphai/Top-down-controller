@@ -5,11 +5,11 @@ namespace TopDownController.Commands
 {
     public class InteractCommand : ICommand 
     {
-        private readonly Character toInteractWith;
+        private readonly CanInteract toInteractWith;
 
-        public InteractCommand(Character charaToInteractWith)
+        public InteractCommand(CanInteract interactWith)
         {
-            toInteractWith = charaToInteractWith;
+            toInteractWith = interactWith;
         }
 
         public void Execute(Vector3 point, Character chara)

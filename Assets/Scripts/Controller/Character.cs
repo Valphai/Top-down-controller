@@ -6,27 +6,27 @@ using UnityEngine.EventSystems;
 
 namespace TopDownController.Controller
 {
-    public abstract class Character : MonoBehaviour, IPointerClickHandler
+    public abstract class Character : CanInteract, IPointerClickHandler
     {
         public Queue<Action> MoveOrderQueue;
+        public float InteractionRange = 3f;
+
         [SerializeField] private bool isControlable;
-        public float InteractionRange = .7f;
-        private Animator anim;
-        private Outline outline;
-        private CharacterSelections charaSelections;
         private List<Collider> ragdollParts;
+        private CharacterSelections charaSelections;
+        protected Animator anim;
         protected NavMeshAgent agent;
         public bool PathCompleted 
-        { 
+        {
             get 
-            { return agent.pathStatus == NavMeshPathStatus.PathComplete && 
-                        agent.remainingDistance == 0; }
-            set { return; }
+            { 
+                return agent.hasPath && 
+                    agent.remainingDistance < InteractionRange;
+            }
         }
-        public abstract void InteractWith(Character chara);
+
         private void Awake()
         {
-            outline = GetComponent<Outline>();
             agent = GetComponent<NavMeshAgent>();
             anim = GetComponentInChildren<Animator>();
             MoveOrderQueue = new Queue<Action>();
@@ -65,6 +65,11 @@ namespace TopDownController.Controller
             Action command = MoveOrderQueue.Dequeue();
             command?.Invoke();
         }
+        public void ResetQueue()
+        {
+            MoveOrderQueue.Clear();
+            agent.ResetPath();
+        }
         public void NavigatePosition(Vector3 point)
         {
             if (isControlable)
@@ -92,19 +97,8 @@ namespace TopDownController.Controller
         {
             if (eventData.clickCount >= 1) 
             {
-                charaSelections.LockCharacter(this);
+                charaSelections.LockTransform(transform);
             }
-        }
-        public void Deselect()
-        {
-            if (outline)
-            {
-                outline.Remove();
-            }
-        }
-        public void Select()
-        {
-            outline.Activate();
         }
         private void OnMouseExit()	
         {
@@ -112,21 +106,19 @@ namespace TopDownController.Controller
                 !charaSelections.CharaSelected.Contains(this)
             )
             {
-                outline.Remove();
+                Deselect();
             }
         }
         private void TurnOnRagdoll()
         {
-            Rigidbody rb = GetComponent<Rigidbody>();
-            rb.useGravity = false;
-            gameObject.GetComponent<BoxCollider>().enabled = false;
+            gameObject.GetComponent<CapsuleCollider>().enabled = false;
             anim.enabled = false;
             anim.avatar = null;
 
             foreach (Collider c in ragdollParts)
             {
                 c.isTrigger = false;
-                // c.attachedRigidbody.velocity = Vector3.zero;
+                c.attachedRigidbody.useGravity = true;
             }
         }
         private void GetRagdollParts()
@@ -136,6 +128,7 @@ namespace TopDownController.Controller
             {
                 if (c.gameObject != gameObject)
                 {
+                    c.attachedRigidbody.useGravity = false;
                     c.isTrigger = true;
                     ragdollParts.Add(c);
                 }

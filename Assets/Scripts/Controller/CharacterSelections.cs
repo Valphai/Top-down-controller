@@ -88,9 +88,9 @@ namespace TopDownController.Controller
             }
             CharaSelected.Clear();
         }
-        public void LockCharacter(Character chara)
+        public void LockTransform(Transform obj)
         {
-            camMovement.LockedChara = chara;
+            camMovement.LockedTransform = obj;
         }
         public void DeSelect(Character chara)
         {

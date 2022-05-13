@@ -25,7 +25,7 @@ namespace TopDownController.Controller
             }
         }
 
-        private void Awake()
+        public virtual void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             anim = GetComponentInChildren<Animator>();
@@ -34,13 +34,13 @@ namespace TopDownController.Controller
             GetRagdollParts();
         }
 
-        private void OnEnable()
+        public virtual void OnEnable()
         {
             charaSelections = 
                 GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
             charaSelections.CharaList.Add(this);
         }
-        private void OnDisable()	
+        public virtual void OnDisable()	
         {
             charaSelections.RemoveFromCharaList(this);
         }
@@ -81,8 +81,9 @@ namespace TopDownController.Controller
         }
         public virtual void Die()
         {
+            DeSelect();
+            ResetQueue();
             charaSelections.RemoveFromCharaList(this);
-            MoveOrderQueue.Clear();
             agent.enabled = false;
             if (ragdollParts.Count > 0) 
             {
@@ -106,7 +107,7 @@ namespace TopDownController.Controller
                 !charaSelections.CharaSelected.Contains(this)
             )
             {
-                Deselect();
+                DeSelect();
             }
         }
         private void TurnOnRagdoll()

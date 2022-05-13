@@ -16,10 +16,13 @@ namespace TopDownController.Samples
         }
         void Update()
         {
-            if (Input.GetKeyDown(KillKey))
+            if (charaList.Count > 0)
             {
-                int randInt = Random.Range(0, charaList.Count);
-                charaList[randInt].Die();
+                if (Input.GetKeyDown(KillKey))
+                {
+                    int randInt = Random.Range(0, charaList.Count);
+                    charaList[randInt].Die();
+                }
             }
         }
     }

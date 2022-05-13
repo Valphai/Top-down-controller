@@ -28,10 +28,8 @@ namespace TopDownController.Commands
             {
                 chara.transform.rotation = Quaternion.LookRotation(direction);
             }
-            if (toInteractWith is Enemy)
-            {
-                chara.AttackAnimation();
-            }
+            
+            chara.InteractWith(toInteractWith);
             toInteractWith.InteractWith(chara);
         }
     }

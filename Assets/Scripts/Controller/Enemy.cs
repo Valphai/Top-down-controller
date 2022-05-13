@@ -7,7 +7,7 @@ namespace TopDownController.Controller
         /// <summary>
         /// Define the behaviour when this enemy has been clicked on
         /// </summary>
-        /// <param name="chara">Selected character when click happend</param>
+        /// <param name="interactable">Selected interactable when click happend</param>
         public override void InteractWith(CanInteract interactable)
         {
             Debug.Log("I am a bad guy! Deal damage to me here");

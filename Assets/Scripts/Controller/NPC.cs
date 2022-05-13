@@ -4,10 +4,10 @@ namespace TopDownController.Controller
 {
     public class NPC : Character
     {
-        /// <summary>
+       /// <summary>
         /// Define the behaviour when this npc has been clicked on
         /// </summary>
-        /// <param name="chara">Selected character when click happend</param>
+        /// <param name="interactable">Selected interactable when click happend</param>
         public override void InteractWith(CanInteract interactable)
         {
             Debug.Log("I'm an NPC! Interact with me here!");

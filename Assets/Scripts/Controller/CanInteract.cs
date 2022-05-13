@@ -8,7 +8,7 @@ namespace TopDownController.Controller
         
         public abstract void InteractWith(CanInteract interactable);
 
-        private void Awake()
+        private void Start()
         {
             outline = GetComponent<Outline>();
         }
@@ -19,7 +19,7 @@ namespace TopDownController.Controller
                 outline.Activate();
             }
         }
-        public void Deselect()
+        public void DeSelect()
         {
             if (outline)
             {

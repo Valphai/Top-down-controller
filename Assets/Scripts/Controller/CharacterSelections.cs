@@ -84,7 +84,7 @@ namespace TopDownController.Controller
         {
             foreach (var chara in CharaSelected)
             {
-                chara.Deselect();
+                chara.DeSelect();
             }
             CharaSelected.Clear();
         }
@@ -94,7 +94,7 @@ namespace TopDownController.Controller
         }
         public void DeSelect(Character chara)
         {
-            chara.Deselect();
+            chara.DeSelect();
             CharaSelected.Remove(chara);
         }
         private void Select(Character chara)

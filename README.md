@@ -5,13 +5,12 @@ Essentially it's a top down controller for Unity3D with movement you'd expect fr
 # List of features
 
 - Navmesh agent path finding,
-- Movement & action order queue,
+- Command pattern based order queue,
 - Enemy attack and NPC interact API exposed,
 - Unit box selection,
 - Control click selection,
 - Group movement,
 - Camera movement, rotation, zoom, world drag
-- Characters See through (Xray) for URP
 
 # Preview
 
@@ -26,7 +25,3 @@ Essentially it's a top down controller for Unity3D with movement you'd expect fr
 ## Multi character movement
 
 ![](./Images/MultiControl.gif)
-
-# Planned ideas
-
-- Boids based movement evasion

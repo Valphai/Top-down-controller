@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using TopDownController.Commands;
 using UnityEngine;
 
@@ -23,11 +22,10 @@ namespace TopDownController.Controller
         private Camera cam;
         private float lastExecution;
 
-        private void Awake()
+        private void Start()
         {
             cam = Camera.main;
-            charaSelections = 
-                GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
+            charaSelections = CharacterSelections.Instance;
         }
         private void Update()	
         {

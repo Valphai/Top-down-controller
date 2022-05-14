@@ -5,6 +5,19 @@ namespace TopDownController.Controller
 {
     public class CharacterSelections : MonoBehaviour
     {
+        private static CharacterSelections _instance;
+        public static CharacterSelections Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    _instance = GameObject.FindObjectOfType<CharacterSelections>();
+                }
+
+                return _instance;
+            }
+        }
         public List<Character> CharaList = new List<Character>();
         public List<Character> CharaSelected = new List<Character>();
 
@@ -60,7 +73,10 @@ namespace TopDownController.Controller
         public void ClickSelect(Character chara)
         {
             DeselectAll();
-            Select(chara);
+            if (CharaList.Contains(chara))
+            {
+                Select(chara);
+            }
         }
         public void ShiftClickSelect(Character chara)
         {
@@ -78,6 +94,10 @@ namespace TopDownController.Controller
             if(CharaList.Contains(chara))
             {
                 CharaList.Remove(chara);
+            }
+            if(CharaSelected.Contains(chara))
+            {
+                DeSelect(chara);
             }
         }
         public void DeselectAll()

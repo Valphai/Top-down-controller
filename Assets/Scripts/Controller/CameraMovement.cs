@@ -11,7 +11,7 @@ namespace TopDownController.Controller
         public BoxCollider Bounds;
         public LayerMask Ground;
         
-        [HideInInspector] 
+        // [HideInInspector] 
         public Transform LockedTransform;
         private Transform swivel, stick;
         private Camera cam;
@@ -40,6 +40,9 @@ namespace TopDownController.Controller
         private void Awake() 
         {
             cam = Camera.main;
+        }
+        private void OnEnable()
+        {
             swivel = transform.GetChild(0);
             stick = swivel.GetChild(0);
 
@@ -73,12 +76,12 @@ namespace TopDownController.Controller
             }
             AdjustPosition();
             AdjustPositionMouseWheel();
-
+            
             if (Input.GetKey(ClickInput.LockUnitButton))
             {
-                LockCharacter();
+                LockedTransform = null;
             }
-
+            LockPositionOn();
         }
 
         private void AdjustPositionMouseWheel()
@@ -108,7 +111,7 @@ namespace TopDownController.Controller
             }
         }
 
-        public void LockCharacter()
+        public void LockPositionOn()
         {
             if (LockedTransform != null)
             {

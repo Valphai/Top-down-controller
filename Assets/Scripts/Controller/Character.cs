@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.EventSystems;
 
 namespace TopDownController.Controller
 {
-    public abstract class Character : CanInteract, IPointerClickHandler
+    public abstract class Character : CanInteract
     {
         public Queue<Action> MoveOrderQueue;
         public float InteractionRange = 3f;
@@ -29,15 +28,16 @@ namespace TopDownController.Controller
         {
             agent = GetComponent<NavMeshAgent>();
             anim = GetComponentInChildren<Animator>();
-            MoveOrderQueue = new Queue<Action>();
-            ragdollParts = new List<Collider>();
-            GetRagdollParts();
         }
 
         public virtual void OnEnable()
         {
-            charaSelections = 
-                GameObject.FindGameObjectWithTag("CharaSelections").GetComponent<CharacterSelections>();
+            MoveOrderQueue = new Queue<Action>();
+            ResetQueue();
+            ragdollParts = new List<Collider>();
+            GetRagdollParts();
+
+            charaSelections = CharacterSelections.Instance;
             charaSelections.CharaList.Add(this);
         }
         public virtual void OnDisable()	
@@ -81,7 +81,6 @@ namespace TopDownController.Controller
         }
         public virtual void Die()
         {
-            DeSelect();
             ResetQueue();
             charaSelections.RemoveFromCharaList(this);
             agent.enabled = false;
@@ -92,13 +91,6 @@ namespace TopDownController.Controller
             else 
             {
                 DieAnimation();
-            }
-        }
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            if (eventData.clickCount >= 1) 
-            {
-                charaSelections.LockTransform(transform);
             }
         }
         private void OnMouseExit()	

@@ -8,6 +8,8 @@ namespace TopDownController.Controller
         /// <param name="interactable">Selected interactable when click happend</param>
         public override void InteractWith(CanInteract interactable)
         {
+            // stops agent movement before interaction
+            agent.ResetPath();
             if (interactable is Enemy)
             {
                 AttackAnimation();

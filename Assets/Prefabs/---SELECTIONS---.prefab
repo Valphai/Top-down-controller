@@ -160,7 +160,7 @@ MonoBehaviour:
     m_Bits: 64
   Ground:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 136
   marker: {fileID: 4112003194955265951}
 --- !u!1 &3769622825940960288
 GameObject:
@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 3769622825940960295}
   m_Layer: 0
   m_Name: CharaSelections
-  m_TagString: CharaSelections
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

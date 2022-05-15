@@ -1,4 +1,6 @@
-namespace TopDownController.Controller
+using TopDownController.Controller;
+
+namespace TopDownController.Entity
 {
     public class Player : Character
     {

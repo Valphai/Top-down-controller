@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TopDownController.Controller
@@ -10,9 +11,7 @@ namespace TopDownController.Controller
         public float RotationSpeed;
         public BoxCollider Bounds;
         public LayerMask MouseWheelDraggable;
-        
-        // [HideInInspector] 
-        public Transform LockedTransform;
+        private Transform lockedTransform;
         private Transform swivel, stick;
         private Camera cam;
         private EdgeRect screenPan;
@@ -107,11 +106,16 @@ namespace TopDownController.Controller
             }
         }
 
+        internal void LockTransform(Transform tra)
+        {
+            lockedTransform = tra;
+        }
+
         public void LockPositionOn()
         {
-            if (LockedTransform != null)
+            if (lockedTransform != null)
             {
-                Vector3 position = LockedTransform.transform.localPosition;
+                Vector3 position = lockedTransform.transform.localPosition;
                 transform.localPosition = ClampPosition(position);
             }
         }
@@ -143,7 +147,7 @@ namespace TopDownController.Controller
 
         private void AdjustPosition(float xDelta, float zDelta)
         {
-            LockedTransform = null;
+            lockedTransform = null;
 
             Quaternion angle = Quaternion.AngleAxis(yRot, Vector3.up);
             Vector3 direction = 

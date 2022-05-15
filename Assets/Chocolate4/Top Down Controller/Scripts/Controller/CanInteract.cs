@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace TopDownController.Controller
 {
+    [RequireComponent(typeof(Outline))]
     public abstract class CanInteract : MonoBehaviour
     {
         private Outline outline;
@@ -20,21 +21,22 @@ namespace TopDownController.Controller
         
         public abstract void InteractWith(CanInteract interactable);
 
-        private void OnMouseOver()
+        public virtual void OnMouseOver()
+        {
+            Select();
+        }
+        public virtual void OnMouseExit()
+        {
+            DeSelect();
+        }
+        public virtual void Select()
         {
             if (Outline)
             {
                 Outline.enabled = true;
             }
         }
-        public void Select()
-        {
-            if (Outline)
-            {
-                Outline.enabled = true;
-            }
-        }
-        public void DeSelect()
+        public virtual void DeSelect()
         {
             if (Outline)
             {

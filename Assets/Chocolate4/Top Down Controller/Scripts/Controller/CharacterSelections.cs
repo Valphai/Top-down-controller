@@ -60,16 +60,9 @@ namespace TopDownController.Controller
                 DrawBoxVisual();
             }
 
+            UpdateUnitQueue();
             UpdateAnimations();
         }
-        private void UpdateAnimations()
-        {
-            foreach (Character chara in CharaList)
-            {
-                chara.MoveAnimation();
-            }
-        }
-
         public void ClickSelect(Character chara)
         {
             DeselectAll();
@@ -112,7 +105,7 @@ namespace TopDownController.Controller
         {
             if (CharaSelected.Count == 1)
             {
-                camMovement.LockedTransform = CharaSelected[0].transform;
+                camMovement.LockTransform(CharaSelected[0].transform);
             }
         }
         public void DeSelect(Character chara)
@@ -181,6 +174,23 @@ namespace TopDownController.Controller
                 if (selectionBox.Contains(cam.WorldToScreenPoint(chara.transform.position)))
                 {
                     DragSelect(chara);
+                }
+            }
+        }
+        private void UpdateAnimations()
+        {
+            foreach (Character chara in CharaList)
+            {
+                chara.MoveAnimation();
+            }
+        }
+        private void UpdateUnitQueue()
+        {
+            foreach (Character chara in CharaList)
+            {
+                if (chara.PathCompleted)
+                {
+                    chara.FollowTheQueue();
                 }
             }
         }

@@ -1,6 +1,7 @@
 using UnityEngine;
+using TopDownController.Controller;
 
-namespace TopDownController.Controller
+namespace TopDownController.Entity
 {
     public class Enemy : Character
     {

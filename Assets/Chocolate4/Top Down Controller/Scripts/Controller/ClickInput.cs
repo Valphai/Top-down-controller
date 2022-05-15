@@ -43,21 +43,7 @@ namespace TopDownController.Controller
                 charaSelections.LockTransform();
 
             }
-            UpdateUnitQueue();
-
         }
-
-        private void UpdateUnitQueue()
-        {
-            foreach (Character chara in charaSelections.CharaList)
-            {
-                if (chara.PathCompleted)
-                {
-                    chara.FollowTheQueue();
-                }
-            }
-        }
-
         private void LMB()
         {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);

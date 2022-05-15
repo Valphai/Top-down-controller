@@ -15,12 +15,24 @@ namespace TopDownController.Controller
         private CharacterSelections charaSelections;
         protected Animator anim;
         protected NavMeshAgent agent;
+        private bool DoOnce;
+
         public bool PathCompleted 
         {
             get 
-            { 
-                return agent.hasPath && 
-                    agent.remainingDistance < InteractionRange;
+            {
+                if (!DoOnce)
+                {
+                    // fires twice
+                    if (agent.hasPath && 
+                    agent.remainingDistance < InteractionRange)
+                    {
+                        DoOnce = true;
+                        return true;
+                    }
+                }
+                DoOnce = false;
+                return false;
             }
         }
 
@@ -101,7 +113,7 @@ namespace TopDownController.Controller
                 DieAnimation();
             }
         }
-        private void OnMouseExit()	
+        public override void OnMouseExit()	
         {
             if (
                 !charaSelections.CharaSelected.Contains(this)

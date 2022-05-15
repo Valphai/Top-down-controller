@@ -1,10 +1,11 @@
 using UnityEngine;
+using TopDownController.Controller;
 
-namespace TopDownController.Controller
+namespace TopDownController.Entity
 {
     public class NPC : Character
     {
-       /// <summary>
+        /// <summary>
         /// Define the behaviour when this npc has been clicked on
         /// </summary>
         /// <param name="interactable">Selected interactable when click happend</param>

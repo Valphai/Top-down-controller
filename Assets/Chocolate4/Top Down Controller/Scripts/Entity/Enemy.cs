@@ -6,10 +6,18 @@ namespace TopDownController.Entity
     public class Enemy : Character
     {
         /// <summary>
+        /// Define the behaviour when this enemy clicked on the interactable
+        /// </summary>
+        /// <param name="interactable">Selected interactable when click happend</param>
+        public override void InteractionWith(CanInteract interactable)
+        {
+
+        }
+        /// <summary>
         /// Define the behaviour when this enemy has been clicked on
         /// </summary>
         /// <param name="interactable">Selected interactable when click happend</param>
-        public override void InteractWith(CanInteract interactable)
+        public override void InteractionFrom(CanInteract interactable)
         {
             Debug.Log("I am a bad guy! Deal damage to me here");
         }

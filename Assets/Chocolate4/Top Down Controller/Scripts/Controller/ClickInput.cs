@@ -97,6 +97,7 @@ namespace TopDownController.Controller
                 for (int i = 0; i < charaSel.Count; i++)
                 {
                     charaSel[i].InteractableTarget = toInteractWith;
+                    Debug.Log(charaSel[i].InteractableTarget);
                 }
 
                 marker.ClickedOn(toInteractWith);

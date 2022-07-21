@@ -20,7 +20,7 @@ namespace TopDownController.Examples
         {
             queueReset -= StopAttack;
         }
-        public override void InteractWith(CanInteract interactable)
+        public override void InteractionWith(CanInteract interactable)
         {
             // stops agent movement before interaction
             agent.ResetPath();
@@ -31,6 +31,10 @@ namespace TopDownController.Examples
                 attacking = RepeatAttack();
                 StartCoroutine(attacking);
             }
+        }
+        public override void InteractionFrom(CanInteract interactable)
+        {
+            
         }
         private void StopAttack()
         {

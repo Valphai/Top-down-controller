@@ -6,7 +6,11 @@ namespace TopDownController.Examples
     public class ShopKeeper : Character
     {
         [SerializeField] private GameObject shopMenu;
-        public override void InteractWith(CanInteract interactable)
+        public override void InteractionWith(CanInteract interactable)
+        {
+            
+        }
+        public override void InteractionFrom(CanInteract interactable)
         {
             OpenShop();
         }

@@ -5,6 +5,7 @@ namespace TopDownController.Commands
 {
     public class InteractCommand : ICommand 
     {
+        /// <param name="chara">this interacts with interactable target, selected chara</param>
         public void Execute(Vector3 point, Character chara)
         {
             Interact(chara);
@@ -15,8 +16,8 @@ namespace TopDownController.Commands
             chara.RotateTowards(toInteractWith.transform.position);
 
             chara.InteractableTarget = null;
-            chara.InteractWith(toInteractWith);
-            toInteractWith.InteractWith(chara);
+            chara.InteractionWith(toInteractWith);
+            toInteractWith.InteractionFrom(chara);
         }
     }
 }

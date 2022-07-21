@@ -21,7 +21,14 @@ namespace TopDownController.Controller
             private set { outline = value; }
         }        
         
-        public abstract void InteractWith(CanInteract interactable);
+        /// <summary>
+        /// Set behaviour when interaction is to be given to the clicked chara
+        /// </summary>
+        public abstract void InteractionWith(CanInteract interactable);
+        /// <summary>
+        /// Set behaviour when interaction is to be received from the selected chara
+        /// </summary>
+        public abstract void InteractionFrom(CanInteract interactable);
 
         public virtual void OnMouseOver()
         {

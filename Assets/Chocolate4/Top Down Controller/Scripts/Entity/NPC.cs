@@ -6,10 +6,18 @@ namespace TopDownController.Entity
     public class NPC : Character
     {
         /// <summary>
+        /// Define the behaviour when this npc clicked on the interactable
+        /// </summary>
+        /// <param name="interactable">Selected interactable when click happend</param>
+        public override void InteractionWith(CanInteract interactable)
+        {
+
+        }
+        /// <summary>
         /// Define the behaviour when this npc has been clicked on
         /// </summary>
         /// <param name="interactable">Selected interactable when click happend</param>
-        public override void InteractWith(CanInteract interactable)
+        public override void InteractionFrom(CanInteract interactable)
         {
             Debug.Log("I'm an NPC! Interact with me here!");
         }

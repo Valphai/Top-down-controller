@@ -1,4 +1,5 @@
 using TopDownController.Controller;
+using UnityEngine;
 
 namespace TopDownController.Entity
 {
@@ -8,13 +9,24 @@ namespace TopDownController.Entity
         /// Define the behaviour when this player clicked on interactable
         /// </summary>
         /// <param name="interactable">Selected interactable when click happend</param>
-        public override void InteractWith(CanInteract interactable)
+        public override void InteractionWith(CanInteract interactable)
         {
             // stops agent movement before interaction
             agent.ResetPath();
             if (interactable is Enemy)
             {
                 AttackAnimation();
+            }
+        }
+        /// <summary>
+        /// Define the behaviour when this player has been clicked on
+        /// </summary>
+        /// <param name="interactable">Selected interactable when click happend</param>
+        public override void InteractionFrom(CanInteract interactable)
+        {
+            if (interactable is Enemy)
+            {
+                Debug.Log("I'm losing hp here!");
             }
         }
         /// <summary>

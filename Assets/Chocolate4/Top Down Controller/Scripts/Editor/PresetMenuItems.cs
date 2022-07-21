@@ -8,46 +8,53 @@ namespace TopDownController.Editor
         [MenuItem("Tools/Top down controler/Essentials")]
         private static void CreateEssentials(MenuCommand menuCommand)
         {
-            Spawn(menuCommand, "Assets/Prefabs/Essentials/---CAMERA---.prefab", false);
-            Spawn(menuCommand, "Assets/Prefabs/Essentials/---SELECTIONS---.prefab", false);
+            Spawn(menuCommand, "Essentials/---CAMERA---.prefab", false);
+            Spawn(menuCommand, "Essentials/---SELECTIONS---.prefab", false);
         }
         [MenuItem("Tools/Top down controler/Spawn player")]
         private static void CreatePlayer(MenuCommand menuCommand)
         {
-            Spawn(menuCommand, "Assets/Prefabs/Player.prefab");
+            Spawn(menuCommand, "Entities/Player.prefab");
         }
         [MenuItem("Tools/Top down controler/Spawn enemy")]
         private static void CreateEnemy(MenuCommand menuCommand)
         {
-            Spawn(menuCommand, "Assets/Prefabs/Enemy.prefab");
+            Spawn(menuCommand, "Entities/Enemy.prefab");
+        }
+        [MenuItem("Tools/Top down controler/Spawn chest")]
+        private static void CreateChest(MenuCommand menuCommand)
+        {
+            Spawn(menuCommand, "Entities/Chest.prefab");
         }
         [MenuItem("Tools/Top down controler/Spawn NPC")]
         private static void CreateNPC(MenuCommand menuCommand)
         {
-            Spawn(menuCommand, "Assets/Prefabs/NPC.prefab");
+            Spawn(menuCommand, "Entities/NPC.prefab");
         }
         [MenuItem("Tools/Top down controler/With ragdoll/Spawn player")]
         private static void CreateRagdollPlayer(MenuCommand menuCommand)
         {
-            Spawn(menuCommand, "Assets/Prefabs/PlayerRagdoll.prefab");
+            Spawn(menuCommand, "Entities/PlayerRagdoll.prefab");
         }
         [MenuItem("Tools/Top down controler/With ragdoll/Spawn enemy")]
         private static void CreateRagdollEnemy(MenuCommand menuCommand)
         {
-            Spawn(menuCommand, "Assets/Prefabs/EnemyRagdoll.prefab");
+            Spawn(menuCommand, "Entities/EnemyRagdoll.prefab");
         }
         [MenuItem("Tools/Top down controler/With ragdoll/Spawn NPC")]
         private static void CreateRagdollNPC(MenuCommand menuCommand)
         {
-            Spawn(menuCommand, "Assets/Prefabs/NPCRagdoll.prefab");
+            Spawn(menuCommand, "Entities/NPCRagdoll.prefab");
         }
         private static void Spawn(
             MenuCommand menuCommand, string prefabPath, bool onSelectedTransform=true
         )
         {
             GameObject go =
-                        AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject))
-                        as GameObject;
+                        AssetDatabase.LoadAssetAtPath(
+                            "Assets/Chocolate4/Top Down Controller/Prefabs/" + prefabPath, 
+                            typeof(GameObject)
+                        ) as GameObject;
             GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
             
             if (onSelectedTransform)

@@ -5,6 +5,8 @@ namespace TopDownController.Controller
     [RequireComponent(typeof(Outline))]
     public abstract class CanInteract : MonoBehaviour
     {
+        [HideInInspector, SerializeField] 
+        public CanInteract InteractableTarget;
         private Outline outline;
         public Outline Outline
         {

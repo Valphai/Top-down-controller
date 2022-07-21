@@ -9,7 +9,6 @@ namespace TopDownController.Controller
     {
         public Queue<Action> MoveOrderQueue;
         public float InteractionRange = 3f;
-
         [SerializeField] private bool isControlable;
         private List<Collider> ragdollParts;
         private CharacterSelections charaSelections;
@@ -23,7 +22,7 @@ namespace TopDownController.Controller
             {
                 if (!DoOnce)
                 {
-                    // fires twice
+                    // fires twice on update
                     if (agent.hasPath && 
                     agent.remainingDistance < InteractionRange)
                     {
@@ -90,6 +89,10 @@ namespace TopDownController.Controller
             MoveOrderQueue.Clear();
             agent.ResetPath();
         }
+        public void AddCommand(Action command)
+        {
+            MoveOrderQueue.Enqueue(command);
+        }
         public void NavigatePosition(Vector3 point)
         {
             if (isControlable)
@@ -98,6 +101,17 @@ namespace TopDownController.Controller
             }
             else
                 charaSelections.DeSelect(this);
+        }
+        public void RotateTowards(Vector3 target)
+        {
+            Vector3 charaPos = transform.position;
+            Vector3 direction = target - charaPos;
+
+            // to prevent message in unity saying "Look rotation viewing vector is zero"
+            if (direction != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
         }
         public virtual void Die()
         {

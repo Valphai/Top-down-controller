@@ -2,7 +2,7 @@ using UnityEngine;
 using TopDownController.Controller;
 using System.Collections.Generic;
 
-namespace TopDownController.Samples
+namespace TopDownController.Examples
 {
     public class Die : MonoBehaviour
     {

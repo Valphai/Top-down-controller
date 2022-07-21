@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using TopDownController.Commands;
 using UnityEngine;
@@ -71,7 +70,9 @@ namespace TopDownController.Controller
 
         private void RMB()
         {
+            List<Character> charaSel = charaSelections.CharaSelected;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            
             ICommand[] commands = null;
             Transform clicked = null;
             Vector3 point = Vector3.zero;
@@ -82,17 +83,27 @@ namespace TopDownController.Controller
                 CanInteract toInteractWith = clicked.GetComponent<CanInteract>();
                 point = hitInfo.point;
 
+                for (int i = 0; i < charaSel.Count; i++)
+                {
+                    charaSel[i].InteractableTarget = toInteractWith;
+                }
+
                 marker.ClickedOn(toInteractWith);
 
                 commands = new ICommand[] {
                     new MoveCommand(),
-                    new InteractCommand(toInteractWith)
+                    new InteractCommand()
                 };
             }
             else if (Physics.Raycast(ray, out RaycastHit hitInfo2, Mathf.Infinity, Ground))
             {
                 clicked = hitInfo2.transform;
                 point = hitInfo2.point;
+
+                for (int i = 0; i < charaSel.Count; i++)
+                {
+                    charaSel[i].InteractableTarget = null;
+                }
 
                 marker.MoveTo(point);
 
@@ -101,7 +112,6 @@ namespace TopDownController.Controller
                 };
             }
 
-            List<Character> charaSel = charaSelections.CharaSelected;
             if (charaSel.Count <= 0) return;
 
             Vector3[] points = 
@@ -112,20 +122,20 @@ namespace TopDownController.Controller
         }
 
 
-        private void QueueUnits(
-            ICommand[] commands, Vector3[] positions, List<Character> charaSel
+        public void QueueUnits(
+            ICommand[] commands, Vector3[] targetPositions, List<Character> charaSel
         )
         {
             for (int i = 0; i < charaSel.Count; i++)
             {
                 Character chara = charaSel[i];
-                Vector3 goal = positions[i];
+                Vector3 goal = targetPositions[i];
                 
                 if (Input.GetKey(QueueUnitsButton))
                 {
                     foreach (ICommand command in commands)
                     {
-                        chara.MoveOrderQueue.Enqueue(() => command.Execute(goal, chara));
+                        chara.AddCommand(() => command.Execute(goal, chara));
                     }
                 }
                 else
@@ -133,7 +143,7 @@ namespace TopDownController.Controller
                     chara.ResetQueue();
                     foreach (ICommand command in commands)
                     {
-                        chara.MoveOrderQueue.Enqueue(() => command.Execute(goal, chara));
+                        chara.AddCommand(() => command.Execute(goal, chara));
                     }
                     chara.FollowTheQueue();
                 }

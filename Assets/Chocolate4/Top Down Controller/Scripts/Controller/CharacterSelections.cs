@@ -192,6 +192,13 @@ namespace TopDownController.Controller
                 {
                     chara.FollowTheQueue();
                 }
+                else if (chara.MoveOrderQueue.Count == 1 && chara.InteractableTarget)
+                {
+                    Vector3 dst = 
+                        (chara.InteractableTarget.transform.position - chara.transform.position)
+                        * chara.InteractionRange;
+                    chara.NavigatePosition(dst);
+                }
             }
         }
     }

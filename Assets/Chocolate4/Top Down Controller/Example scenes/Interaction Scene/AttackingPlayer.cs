@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using TopDownController.Commands;
+using System.Collections;
 using TopDownController.Controller;
 using TopDownController.Entity;
 using UnityEngine;
@@ -8,8 +7,19 @@ namespace TopDownController.Examples
 {
     public class AttackingPlayer : Character
     {
-        [SerializeField] ClickInput clickInput;
+        [SerializeField] private ClickInput clickInput;
+        [SerializeField] private float attackSpeed = 1f;
+        private IEnumerator attacking;
 
+        public override void Awake()
+        {
+            base.Awake();
+            queueReset += StopAttack;
+        }
+        public override void OnDisable()
+        {
+            queueReset -= StopAttack;
+        }
         public override void InteractWith(CanInteract interactable)
         {
             // stops agent movement before interaction
@@ -18,19 +28,22 @@ namespace TopDownController.Examples
             {
                 AttackAnimation();
                 InteractableTarget = interactable;
-                RepeatAttack();
+                attacking = RepeatAttack();
+                StartCoroutine(attacking);
             }
         }
-        private void RepeatAttack()
+        private void StopAttack()
         {
-            clickInput.QueueUnits(
-                new ICommand[] {
-                    new MoveCommand(),
-                    new InteractCommand()
-                }, 
-                new Vector3[] { transform.position },
-                new List<Character>() { this }
-            );
+            if (attacking != null)
+            {
+                StopCoroutine(attacking);
+            }
+        }
+        private IEnumerator RepeatAttack()
+        {
+            yield return new WaitForSeconds(attackSpeed);
+
+            clickInput.InteractOnTheSpotUsing(this);
         }
     }
 }

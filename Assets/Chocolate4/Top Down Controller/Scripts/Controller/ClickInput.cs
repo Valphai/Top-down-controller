@@ -43,6 +43,17 @@ namespace TopDownController.Controller
 
             }
         }
+        public void InteractOnTheSpotUsing(Character chara)
+        {
+            QueueUnits(
+                new ICommand[] {
+                    new MoveCommand(),
+                    new InteractCommand()
+                }, 
+                new Vector3[] { chara.transform.position },
+                new List<Character>() { chara }
+            );
+        }
         private void LMB()
         {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -121,8 +132,7 @@ namespace TopDownController.Controller
             QueueUnits(commands, points, charaSel);
         }
 
-
-        public void QueueUnits(
+        private void QueueUnits(
             ICommand[] commands, Vector3[] targetPositions, List<Character> charaSel
         )
         {

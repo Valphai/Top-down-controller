@@ -14,6 +14,7 @@ namespace TopDownController.Controller
         private CharacterSelections charaSelections;
         protected Animator anim;
         protected NavMeshAgent agent;
+        protected event Action queueReset;
         private bool DoOnce;
 
         public bool PathCompleted 
@@ -86,6 +87,7 @@ namespace TopDownController.Controller
         }
         public void ResetQueue()
         {
+            queueReset?.Invoke();
             MoveOrderQueue.Clear();
             agent.ResetPath();
         }

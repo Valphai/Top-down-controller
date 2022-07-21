@@ -4261,6 +4261,7 @@ MonoBehaviour:
   InteractionRange: 3
   isControlable: 1
   clickInput: {fileID: 578217474}
+  attackSpeed: 1
 --- !u!4 &8236353642923793234
 Transform:
   m_ObjectHideFlags: 0
